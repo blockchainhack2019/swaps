@@ -208,29 +208,29 @@ class Contract {
     const amount      = 0.1
     const amountWei   = web3.utils.toWei(amount.toString())
 
-    const args        = [ `0x${secretHash}`, Bob.info.ethAddress ]
-    const params      = { from: Alice.info.ethAddress, value: amountWei }
+    const args        = [ `0x${secretHash}`, Bob.info.eth.address ]
+    const params      = { from: Alice.info.eth.address, value: amountWei }
 
     return this.send('createSwap', args, params)
   }
 
   getBalance() {
-    const args    = [ Alice.info.ethAddress, Bob.info.ethAddress ]
-    const params  = { from: Bob.info.ethAddress }
+    const args    = [ Alice.info.eth.address, Bob.info.eth.address ]
+    const params  = { from: Bob.info.eth.address }
 
     return this.call('getBalance', args, params)
   }
 
   withdraw(secret) {
-    const args    = [ `0x${secret}`, Alice.info.ethAddress, Bob.info.ethAddress ]
-    const params  = { from: Bob.info.ethAddress }
+    const args    = [ `0x${secret}`, Alice.info.eth.address, Bob.info.eth.address ]
+    const params  = { from: Bob.info.eth.address }
 
     return this.send('withdraw', args, params)
   }
 
   getSecret() {
-    const args    = [ Alice.info.ethAddress, Bob.info.ethAddress ]
-    const params  = { from: Alice.info.ethAddress }
+    const args    = [ Alice.info.eth.address, Bob.info.eth.address ]
+    const params  = { from: Alice.info.eth.address }
 
     return this.call('getSecret', args, params)
   }

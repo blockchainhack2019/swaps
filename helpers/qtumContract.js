@@ -216,26 +216,26 @@ class Contract {
     const amount        = 0.1
     const amountSatoshi = amount * 1e8
 
-    const args    = [ secretHash, Contract.modifyWalletAddress(Alice.info.qtumAddress) ]
+    const args    = [ secretHash, Contract.modifyWalletAddress(Alice.info.qtum.address) ]
     const params  = { amount: amountSatoshi }
 
     return this.send('createSwap', Bob.qtum, args, params)
   }
 
   getBalance() {
-    const args = [ Contract.modifyWalletAddress(Bob.info.qtumAddress), Contract.modifyWalletAddress(Alice.info.qtumAddress) ]
+    const args = [ Contract.modifyWalletAddress(Bob.info.qtum.address), Contract.modifyWalletAddress(Alice.info.qtum.address) ]
 
     return this.call('getBalance', Alice.qtum, args)
   }
 
   withdraw() {
-    const args = [ Bob.info.secret, Contract.modifyWalletAddress(Bob.info.qtumAddress), Contract.modifyWalletAddress(Alice.info.qtumAddress),  ]
+    const args = [ Bob.info.secret, Contract.modifyWalletAddress(Bob.info.qtum.address), Contract.modifyWalletAddress(Alice.info.qtum.address),  ]
 
     return this.send('withdraw', Alice.qtum, args)
   }
 
   getSecret() {
-    const args = [ Contract.modifyWalletAddress(Bob.info.qtumAddress), Contract.modifyWalletAddress(Alice.info.qtumAddress) ]
+    const args = [ Contract.modifyWalletAddress(Bob.info.qtum.address), Contract.modifyWalletAddress(Alice.info.qtum.address) ]
 
     return this.call('getSecret', Bob.qtum, args)
   }
