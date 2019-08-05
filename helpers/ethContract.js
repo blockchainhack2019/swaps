@@ -5,6 +5,7 @@ const { web3 } = require('./eth')
 class Contract {
 
   constructor() {
+    this.name = 'ETH Contract'
     this.gasLimit = 3e6
     this.abi      = [
       {
@@ -151,18 +152,18 @@ class Contract {
     this.contract = new web3.eth.Contract(this.abi, this.address)
   }
 
-  call(method, args, params = {}) {
+  call(method, args, params = {}, silence) {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(`\nStart ethContract.${method}()`)
+        if (!silence) console.log(`\nStart ethContract.${method}()`)
 
         const data = await this.contract.methods[method](...args).call(params)
 
-        console.log(`Success ethContract.${method}()`)
+        if (!silence) console.log(`\rSuccess`)
         resolve(data)
       }
       catch (err) {
-        console.log(`Fail ethContract.${method}(). Error:`, err)
+        if (!silence) console.log(`\rError:`, err)
         reject(err)
       }
     })
@@ -181,30 +182,30 @@ class Contract {
           gas: this.gasLimit,
         })
           .on('transactionHash', (hash) => {
-            console.log(`\rethContract.${method}() transaction:`, hash)
+            console.log(`\rTransaction:`, hash)
 
             transactionHash = hash
           })
           .on('error', (err) => {
             error = err
 
-            console.log(`Error ethContract.${method}(). Error:`, err)
+            console.log(`\rError:`, err)
             reject({ error, transactionHash })
           })
 
         if (!error) {
-          console.log(`Success ethContract.${method}()`)
+          console.log(`\rSuccess`)
           resolve({ data, transactionHash })
         }
       }
       catch (err) {
-        console.log(`Fail ethContract.${method}(). Error:`, err)
+        console.log(`\rError:`, err)
         reject(err)
       }
     })
   }
 
-  fund(secretHash) {
+  fund({ secretHash }) {
     const amount      = 0.1
     const amountWei   = web3.utils.toWei(amount.toString())
 
@@ -218,10 +219,10 @@ class Contract {
     const args    = [ Alice.info.eth.address, Bob.info.eth.address ]
     const params  = { from: Bob.info.eth.address }
 
-    return this.call('getBalance', args, params)
+    return this.call('getBalance', args, params, true)
   }
 
-  withdraw(secret) {
+  withdraw({ secret }) {
     const args    = [ `0x${secret}`, Alice.info.eth.address, Bob.info.eth.address ]
     const params  = { from: Bob.info.eth.address }
 

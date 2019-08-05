@@ -21,15 +21,22 @@ class Loader {
 
 const loader = new Loader()
 
-const wait = async (promise) => {
-  loader.start()
+const wait = (promise) =>
+  new Promise(async (resolve, reject) => {
+    loader.start()
 
-  const result = await promise
+    try {
+      const result = await promise
 
-  loader.stop()
-
-  return result
-}
+      resolve(result)
+    }
+    catch (err) {
+      reject()
+    }
+    finally {
+      loader.stop()
+    }
+  })
 
 
 module.exports = {

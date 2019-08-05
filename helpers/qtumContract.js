@@ -10,6 +10,7 @@ class Contract {
   }
 
   constructor() {
+    this.name = 'QTUM Contract'
     this.gasPrice = 400
     this.gasLimit = 3e6
     this.abi      = [
@@ -169,31 +170,31 @@ class Contract {
     }, {})
   }
 
-  executeMethod(executor, method, wallet, args = [], params = {}) {
+  executeMethod(executor, method, wallet, args = [], params = {}, silence) {
     const methodParams  = this.methods[method]
     const encodedData   = encodeMethod(methodParams, args).substr(2)
 
     return new Promise((resolve, reject) => {
-      console.log(`\nStart qtumContract.${method}()`)
+      if (!silence) console.log(`\nStart qtumContract.${method}()`)
 
       wallet[executor](this.address, encodedData, {
         ...params,
         feeRate: this.gasPrice,
       })
         .then((tx) => {
-          console.log(`\nSuccess qtumContract.${method}()`)
+          if (!silence) console.log(`\rSuccess`)
           resolve(tx)
         })
         .catch((err) => {
-          console.log(`\nFail qtumContract.${method}(). Error:`, err)
+          if (!silence) console.log(`\rError:`, err)
           reject(err)
         })
     })
   }
 
-  call(method, wallet, args, params = {}) {
+  call(method, wallet, args, params = {}, silence) {
     return new Promise((resolve, reject) => {
-      this.executeMethod('contractCall', method, wallet, args, params)
+      this.executeMethod('contractCall', method, wallet, args, params, silence)
         .then((receipt) => {
           const { executionResult: { output } } = receipt
 
@@ -204,40 +205,58 @@ class Contract {
     })
   }
 
-  async send(method, wallet, args, params = {}) {
-    const { txid } = await this.executeMethod('contractSend', method, wallet, args, params)
+  async send(method, wallet, args, params = {}, silence) {
+    const { txid } = await this.executeMethod('contractSend', method, wallet, args, params, silence)
 
-    console.log('\rqtum transaction:', txid)
+    console.log('\rTransaction:', txid)
 
     return txid
   }
 
-  fund(secretHash) {
+  /**
+   *
+   * @param {Object} data
+   * @param {string} data.secretHash
+   * @returns {Promise}
+   */
+  fund({ secretHash }) {
     const amount        = 0.1
     const amountSatoshi = amount * 1e8
 
     const args    = [ secretHash, Contract.modifyWalletAddress(Alice.info.qtum.address) ]
     const params  = { amount: amountSatoshi }
 
-    return this.send('createSwap', Bob.qtum, args, params)
+    return this.send('createSwap', Bob.accounts.qtum, args, params)
   }
 
+  /**
+   *
+   * @returns {Promise<number>}
+   */
   getBalance() {
     const args = [ Contract.modifyWalletAddress(Bob.info.qtum.address), Contract.modifyWalletAddress(Alice.info.qtum.address) ]
 
-    return this.call('getBalance', Alice.qtum, args)
+    return this.call('getBalance', Alice.accounts.qtum, args, {}, true)
   }
 
+  /**
+   *
+   * @returns {Promise}
+   */
   withdraw() {
-    const args = [ Bob.info.secret, Contract.modifyWalletAddress(Bob.info.qtum.address), Contract.modifyWalletAddress(Alice.info.qtum.address),  ]
+    const args = [ Alice.info.secret, Contract.modifyWalletAddress(Bob.info.qtum.address), Contract.modifyWalletAddress(Alice.info.qtum.address),  ]
 
-    return this.send('withdraw', Alice.qtum, args)
+    return this.send('withdraw', Alice.accounts.qtum, args)
   }
 
+  /**
+   *
+   * @returns {Promise<string>}
+   */
   getSecret() {
     const args = [ Contract.modifyWalletAddress(Bob.info.qtum.address), Contract.modifyWalletAddress(Alice.info.qtum.address) ]
 
-    return this.call('getSecret', Bob.qtum, args)
+    return this.call('getSecret', Bob.accounts.qtum, args)
   }
 }
 
