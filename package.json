@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/blockchainhack2019/swaps#readme",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "bitcoinjs-lib": "^3.3.2",
     "qtumjs-ethjs-abi": "^1.0.3",
     "qtumjs-wallet": "^0.2.1",
